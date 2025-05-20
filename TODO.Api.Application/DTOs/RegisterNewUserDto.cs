@@ -9,6 +9,6 @@
         public string Password { get; set; }
         public string ConfirmPassword { get; set; }
         public string PhoneNumber { get; set; }
-        public string? PictureUrl { get; set; }
+        public string? PictureUrlBase64 { get; set; }
     }
 }

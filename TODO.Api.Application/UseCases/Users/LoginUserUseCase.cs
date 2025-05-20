@@ -1,8 +1,5 @@
-﻿using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
 using TODO.Api.Application.AppSettings;
 using TODO.Api.Application.DTOs;
 
@@ -11,37 +8,53 @@ namespace TODO.Api.Application.UseCases.Users
     public class LoginUserUseCase : ILoginUserUseCase
     {
         private readonly JwtAuthConfiguration _config;
-        public LoginUserUseCase(IOptions<JwtAuthConfiguration> options)
+        private readonly UserManager<IdentityUser> _userManager;
+        private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly ITokenService _tokenService;
+        public LoginUserUseCase(
+            IOptions<JwtAuthConfiguration> options,
+            UserManager<IdentityUser> userManager,
+            SignInManager<IdentityUser> signInManager,
+            ITokenService tokenService)
         {
             _config = options.Value;
+            _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
+            _signInManager = signInManager ?? throw new ArgumentNullException(nameof(signInManager));
+            _tokenService = tokenService;
         }
 
         public async Task<(FinalValidationResultDto, TokenJwtResultDto)> Process(string userName, string password)
         {
+            var validationResult = new FinalValidationResultDto(false, new List<FinalErrorDto>());
 
-
-            throw new NotImplementedException();
-        }
-
-        private string GenerateJwtToken(string username)
-        {
-            var claims = new[]
+            if (string.IsNullOrEmpty(userName) || string.IsNullOrEmpty(password))
             {
-            new Claim(JwtRegisteredClaimNames.Sub, username),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-        };
+                validationResult.AddError("UserName", "UserName and password are required", "UserNameAndPasswordRequired");
+                return (validationResult, null);
+            }
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config.Secret));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            var user = await _userManager.FindByNameAsync(userName);
+            if (user == null)
+            {
+                validationResult.AddError("UserName", "User not found", "UserNotFound");
+                return (validationResult, null);
+            }
+            var result = await _signInManager.CheckPasswordSignInAsync(user, password, false);
+            if (!result.Succeeded)
+            {
+                switch (result.IsLockedOut)
+                {
+                    case true:
+                        validationResult.AddError("UserName", "User is locked out", "UserLockedOut");
+                        break;
+                    case false:
+                        validationResult.AddError("UserName", "Invalid password", "InvalidPassword");
+                        break;
+                }
+            }
+            var token = _tokenService.GenerateToken(user.UserName);
 
-            var token = new JwtSecurityToken(
-                issuer: _config.Issuer,
-                audience: _config.Audience,
-                claims: claims,
-                expires: DateTime.Now.AddMinutes(_config.ExpirationInMinutes),
-                signingCredentials: creds);
-
-            return new JwtSecurityTokenHandler().WriteToken(token);
+            return (validationResult, new TokenJwtResultDto(user.UserName, string.Empty, token));
         }
     }
 }

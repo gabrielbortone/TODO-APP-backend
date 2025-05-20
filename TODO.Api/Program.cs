@@ -20,6 +20,8 @@ builder.Services.AddCors(options =>
 builder.Services.AddAppSettings(configuration);
 builder.Services.AddInfraData(configuration);
 builder.Services.AddApplicationServices();
+builder.Services.AddAuthConfiguration(configuration);
+
 
 var app = builder.Build();
 
@@ -30,6 +32,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+
 
 app.UseHttpsRedirection();
 
