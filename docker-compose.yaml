@@ -1,10 +1,19 @@
 services:
+    file-server:
+        build:
+            context: ./file-server
+        ports:
+            - "8080:80"
+        volumes:
+            - ./uploads:/usr/share/nginx/html/images
     api:
         build: ./TODO.Api
         ports:
             - "5000:8081"
         depends_on: 
             - database
+        volumes:
+            - ./uploads:/uploads
     database:
         image: postgres:17.5
         environment:

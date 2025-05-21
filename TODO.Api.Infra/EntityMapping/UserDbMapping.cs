@@ -9,7 +9,7 @@ namespace TODO.Api.Infra.EntityMapping
         {
             modelBuilder.Entity<User>(e =>
             {
-                e.ToTable("Users");
+                e.ToTable("ToDoUsers");
                 e.HasKey(u => u.Id);
                 e.Property(u=> u.UserName)
                     .IsRequired()

@@ -5,10 +5,20 @@
         public string UserName { get; private set; }
         public string NormalizedUserName { get; private set; }
         public string? PictureUrl { get; private set; }
+        public string IdentityUserId { get; private set; }
         public virtual ICollection<TodoItem> TodoItems { get; private set; }
 
-        public User(string userName, string pictureUrl)
+        public void Update(string userName, string pictureUrl)
         {
+            UserName = userName;
+            NormalizedUserName = UserName.Normalize();
+            PictureUrl = pictureUrl;
+            UpdateEntityBase();
+        }
+
+        public User(string identityUserId,string userName, string pictureUrl)
+        {
+            IdentityUserId = identityUserId;
             UserName = userName;
             NormalizedUserName = UserName.Normalize();
             PictureUrl = pictureUrl;

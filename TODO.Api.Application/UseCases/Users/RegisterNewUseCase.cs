@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using TODO.Api.Application.DTOs;
 using TODO.Api.Domain.Entities;
+using TODO.Api.Infra.Repositories.Abstract;
 
 namespace TODO.Api.Application.UseCases.Users
 {
@@ -9,14 +10,18 @@ namespace TODO.Api.Application.UseCases.Users
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly ITokenService _tokenService;
+        private readonly IUserRepository _userRepository;
+
         public RegisterNewUseCase(
             UserManager<IdentityUser> userManager,
             SignInManager<IdentityUser> signInManager,
-            ITokenService tokenService)
+            ITokenService tokenService,
+            IUserRepository userRepository)
         {
             _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
             _signInManager = signInManager ?? throw new ArgumentNullException(nameof(signInManager));
             _tokenService = tokenService;
+            _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
         }
         public async Task<FinalValidationResultDto> Process(RegisterNewUserDto userDto)
         {
@@ -36,7 +41,19 @@ namespace TODO.Api.Application.UseCases.Users
 
             // save and add image
             string pictureUrl = string.Empty;
-            var todoUser = new User(userDto.UserName, pictureUrl);
+
+            try
+            {
+                var todoUser = new User(user.Id, userDto.UserName, pictureUrl);
+
+                _
+            }
+            catch (Exception ex)
+            {
+                validationResult.AddError("User", "Error creating user", ex.Message);
+                return validationResult;
+            }
+
 
 
 
