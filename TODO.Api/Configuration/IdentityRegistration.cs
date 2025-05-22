@@ -14,10 +14,8 @@ namespace TODO.Api.Configuration
             app.UseAuthorization();
         }
 
-
         public static IServiceCollection AddAuthConfiguration(this IServiceCollection services, IConfiguration configuration)
         {
-;
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {

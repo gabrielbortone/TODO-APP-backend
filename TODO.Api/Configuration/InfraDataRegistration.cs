@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using TODO.Api.Infra.Context;
+using TODO.Api.Infra.Repositories.Abstract;
+using TODO.Api.Infra.Repositories.Concrete;
 
 namespace TODO.Api.Configuration
 {
@@ -14,7 +16,11 @@ namespace TODO.Api.Configuration
             services.AddIdentity<IdentityUser, IdentityRole>()
                 .AddEntityFrameworkStores<TodoItemDbContext>()
                 .AddDefaultTokenProviders();
-            
+
+            services.AddScoped<ICategoryRepository, CategoryRepository>();
+            services.AddScoped<ITodoRepository, TodoRepository>();
+            services.AddScoped<IUserRepository, UserRepository>();
+
             return services;
         }
     }

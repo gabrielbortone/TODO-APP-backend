@@ -1,10 +1,16 @@
-﻿namespace TODO.Api.Configuration
+﻿using TODO.Api.Application.Services;
+using TODO.Api.Application.UseCases.Users;
+
+namespace TODO.Api.Configuration
 {
     public static class ServicesRegistration
     {
         public static IServiceCollection AddApplicationServices(this IServiceCollection services)
         {
-
+            services.AddScoped<IImageService, ImageService>();
+            services.AddScoped<ITokenService, TokenService>();
+            services.AddScoped<ILoginUserUseCase, LoginUserUseCase>();
+            services.AddScoped<IRegisterNewUserUseCase, RegisterNewUserUseCase>();
 
             return services;
         }

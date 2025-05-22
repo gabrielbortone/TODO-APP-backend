@@ -5,14 +5,14 @@ using TODO.Api.Infra.Repositories.Abstract;
 
 namespace TODO.Api.Application.UseCases.Users
 {
-    public class RegisterNewUseCase : IRegisterNewUserUseCase
+    public class RegisterNewUserUseCase : IRegisterNewUserUseCase
     {
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly ITokenService _tokenService;
         private readonly IUserRepository _userRepository;
 
-        public RegisterNewUseCase(
+        public RegisterNewUserUseCase(
             UserManager<IdentityUser> userManager,
             SignInManager<IdentityUser> signInManager,
             ITokenService tokenService,
@@ -45,8 +45,11 @@ namespace TODO.Api.Application.UseCases.Users
             try
             {
                 var todoUser = new User(user.Id, userDto.UserName, pictureUrl);
-
-                _
+                var resultTodoUser = await _userRepository.Create(todoUser);
+                if (!resultTodoUser)
+                {
+                    throw new Exception("Error creating user in database");
+                }
             }
             catch (Exception ex)
             {

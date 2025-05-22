@@ -1,11 +1,16 @@
 services:
-    file-server:
-        build:
-            context: ./file-server
+    minio:
+        image: minio/minio
+        container_name: minio
         ports:
-            - "8080:80"
+            - "9000:9000"
+            - "9001:9001"
+        environment:
+            MINIO_ROOT_USER: minio
+            MINIO_ROOT_PASSWORD: pQneK51#3~.
+        command: server /data --console-address ":9001"
         volumes:
-            - ./uploads:/usr/share/nginx/html/images
+            - minio-data:/data
     api:
         build: ./TODO.Api
         ports:
@@ -25,4 +30,5 @@ services:
         volumes:
             - db_data:/var/lib/postgresql/data
 volumes:
-  db_data:
+    minio-data:
+    db_data:

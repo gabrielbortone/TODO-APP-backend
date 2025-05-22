@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using TODO.Api.Application.DTOs;
 
 namespace TODO.Api.Application.Services
 {
     public interface IImageService
     {
-
+        Task<ImageResultDto> UploadFile(string base64String);
+        Task<bool> DeleteFile(string fileName);
     }
 }
