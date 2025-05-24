@@ -4,6 +4,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using TODO.Api.Application.AppSettings;
+using TODO.Api.Application.DTOs;
 
 namespace TODO.Api.Application.UseCases.Users
 {
@@ -38,9 +39,36 @@ namespace TODO.Api.Application.UseCases.Users
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-        public bool ValidateToken(string token)
+        public Guid GetUserIdFromToken(JwtToken token)
         {
-            var result = new JwtSecurityTokenHandler().ValidateToken(token, new TokenValidationParameters
+            var handler = new JwtSecurityTokenHandler();
+
+            if (this.ValidateToken(token))
+            {
+                var jwtToken = handler.ReadJwtToken(token.Token);
+                var userIdClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.NameId);
+                if (userIdClaim == null)
+                {
+                    throw new Exception("User ID claim not found in token.");
+                }
+
+                if (!Guid.TryParse(userIdClaim.Value, out Guid userId))
+                {
+                    throw new Exception("Invalid User ID claim in token.");
+                }
+
+                return userId;
+            }
+            else
+            {
+                throw new Exception("Invalid token.");
+            }
+            
+        }
+
+        public bool ValidateToken(JwtToken token)
+        {
+            var result = new JwtSecurityTokenHandler().ValidateToken(token.Token, new TokenValidationParameters
             {
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config.Secret)),
