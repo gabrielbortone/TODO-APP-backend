@@ -6,7 +6,14 @@
         public string NormalizedUserName { get; private set; }
         public string? PictureUrl { get; private set; }
         public string IdentityUserId { get; private set; }
+        public bool? IsDeleted { get; private set; } = false;
         public virtual ICollection<TodoItem> TodoItems { get; private set; }
+
+        public void Delete()
+        {
+            IsDeleted = true;
+            UpdateEntityBase();
+        }
 
         public void Update(string userName, string pictureUrl)
         {

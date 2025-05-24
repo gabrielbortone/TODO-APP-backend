@@ -4,8 +4,8 @@ namespace TODO.Api.Application.UseCases.Users
 {
     public interface ITokenService
     {
-        string GenerateToken(string username, Guid userId);
+        string GenerateToken(string username, string userId);
         bool ValidateToken(JwtToken token);
-        Guid GetUserIdFromToken(JwtToken token);
+        string GetUserIdFromToken(JwtToken token);
     }
 }

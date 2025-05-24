@@ -17,11 +17,11 @@ namespace TODO.Api.Application.UseCases.Users
             _config = options.Value;
         }
 
-        public string GenerateToken(string username, Guid userId)
+        public string GenerateToken(string username, string userId)
         {
             var claims = new[]
             {
-                new Claim(JwtRegisteredClaimNames.NameId, userId.ToString()),
+                new Claim(JwtRegisteredClaimNames.NameId, userId),
                 new Claim(JwtRegisteredClaimNames.Sub, username),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
@@ -39,7 +39,7 @@ namespace TODO.Api.Application.UseCases.Users
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-        public Guid GetUserIdFromToken(JwtToken token)
+        public string GetUserIdFromToken(JwtToken token)
         {
             var handler = new JwtSecurityTokenHandler();
 
@@ -52,12 +52,7 @@ namespace TODO.Api.Application.UseCases.Users
                     throw new Exception("User ID claim not found in token.");
                 }
 
-                if (!Guid.TryParse(userIdClaim.Value, out Guid userId))
-                {
-                    throw new Exception("Invalid User ID claim in token.");
-                }
-
-                return userId;
+                return userIdClaim.Value;
             }
             else
             {

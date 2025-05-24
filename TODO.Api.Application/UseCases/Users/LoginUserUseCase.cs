@@ -63,7 +63,7 @@ namespace TODO.Api.Application.UseCases.Users
 
             var userProfile = await _userRepository.GetByIdentityUserId(identityUserid);
 
-            var token = _tokenService.GenerateToken(user.UserName);
+            var token = _tokenService.GenerateToken(user.UserName, identityUserid);
 
             return (validationResult, new TokenJwtResultDto(user.UserName, userProfile.PictureUrl, token));
         }

@@ -48,7 +48,9 @@ namespace TODO.Api.Infra.Repositories.Concrete
             if (user == null)
                 return false;
 
-            _dbContext.ToDoUsers.Remove(user);
+            user.Delete();
+
+            _dbContext.ToDoUsers.Update(user);
 
             return await _dbContext.Commit();
         }

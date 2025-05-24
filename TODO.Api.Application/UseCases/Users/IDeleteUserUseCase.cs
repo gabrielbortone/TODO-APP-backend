@@ -4,6 +4,6 @@ namespace TODO.Api.Application.UseCases.Users
 {
     public interface IDeleteUserUseCase
     {
-        Task<FinalValidationResultDto> Process(Guid id);
+        Task<FinalValidationResultDto> Process(string id);
     }
 }
