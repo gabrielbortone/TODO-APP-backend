@@ -16,10 +16,11 @@ namespace TODO.Api.Application.UseCases.Users
             _config = options.Value;
         }
 
-        public string GenerateToken(string username)
+        public string GenerateToken(string username, Guid userId)
         {
             var claims = new[]
             {
+                new Claim(JwtRegisteredClaimNames.NameId, userId.ToString()),
                 new Claim(JwtRegisteredClaimNames.Sub, username),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
