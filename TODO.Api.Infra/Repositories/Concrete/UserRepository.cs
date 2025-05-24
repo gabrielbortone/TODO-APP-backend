@@ -19,16 +19,11 @@ namespace TODO.Api.Infra.Repositories.Concrete
                 .SingleOrDefaultAsync(x => x.IdentityUserId == id);
         }
 
-        public Task<User> GetByUserName(string userName)
-        {
-            return _dbContext.ToDoUsers
-                .SingleOrDefaultAsync(x => x.UserName == userName);
-        }
         public async Task<bool> Update(User userParams)
         {
             var user = await this.GetByIdentityUserId(userParams.IdentityUserId);
 
-            user.Update(userParams.UserName, userParams.PictureUrl);
+            user.Update(userParams.FirstName, userParams.LastName, userParams.PictureUrl);
 
             _dbContext.ToDoUsers.Update(user);
 
@@ -37,7 +32,7 @@ namespace TODO.Api.Infra.Repositories.Concrete
 
         public async Task<bool> Create(User userParams)
         {
-            var user = new User(userParams.IdentityUserId, userParams.UserName, userParams.PictureUrl);
+            var user = new User(userParams.IdentityUserId, userParams.FirstName, userParams.LastName,  userParams.PictureUrl);
             await _dbContext.ToDoUsers.AddAsync(user);
             return await _dbContext.Commit();
         }

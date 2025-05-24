@@ -11,6 +11,9 @@ namespace TODO.Api.Configuration
             services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<ILoginUserUseCase, LoginUserUseCase>();
             services.AddScoped<IRegisterNewUserUseCase, RegisterNewUserUseCase>();
+            services.AddScoped<IDeleteUserUseCase, DeleteUserUseCase>();
+            services.AddScoped<IUpdateUserUseCase, UpdateUserUseCase>();
+            services.AddScoped<IGetUserUseCase, GetUserUseCase>();
 
             return services;
         }

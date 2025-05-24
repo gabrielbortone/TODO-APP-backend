@@ -27,7 +27,7 @@ namespace TODO.Api.Application.UseCases.Users
             _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
             _imageService = imageService ?? throw new ArgumentNullException(nameof(imageService));
         }
-        public async Task<FinalValidationResultDto> Process(RegisterNewUserDto userDto)
+        public async Task<(FinalValidationResultDto, UserResumeDto)> Process(RegisterNewUserDto userDto)
         {
             var validationResult = new FinalValidationResultDto(true, new List<FinalErrorDto>());
 
@@ -40,48 +40,45 @@ namespace TODO.Api.Application.UseCases.Users
                 {
                     validationResult.AddError(error.Code, error.Description, error.Code);
                 }
-                return validationResult;
+                return (validationResult, null);
             }
 
             string pictureUrl = string.Empty;
 
             if (!string.IsNullOrEmpty(userDto.PictureUrlBase64))
             {
-                try
+                var imageResult = await _imageService.UploadFile(userDto.PictureUrlBase64);
+                if (imageResult == null || string.IsNullOrEmpty(imageResult.ImageUrl))
                 {
-                    var imageResult = await _imageService.UploadFile(userDto.PictureUrlBase64);
-                    if (imageResult == null || string.IsNullOrEmpty(imageResult.ImageUrl))
-                    {
-                        validationResult.AddError("User", "Error uploading image", "ImageUploadError");
-                        return validationResult;
-                    }
+                    validationResult.AddError("User", "Error uploading image", "ImageUploadError");
+                    await this.RevertUserRegister(user.UserName);
+                    return (validationResult, null);
+                }
 
-                    pictureUrl = imageResult.ImageUrl;
-                }
-                catch (Exception ex)
-                {
-                    validationResult.AddError("User", "Error saving image", ex.Message);
-                    return validationResult;
-                }
+                pictureUrl = imageResult.ImageUrl;
             }
 
             try
             {
-                var todoUser = new User(user.Id, userDto.UserName, pictureUrl);
+                var todoUser = new User(user.Id, userDto.FirstName, userDto.LastName, pictureUrl);
                 var resultTodoUser = await _userRepository.Create(todoUser);
                 if (!resultTodoUser)
                 {
-                    this.RevertUserRegister(user.UserName);
+                    await this.RevertUserRegister(user.UserName);
                     throw new Exception("Error creating user in database");
                 }
+
+                return (validationResult, UserResumeDto.FromUser( todoUser, user));
             }
             catch (Exception ex)
             {
                 validationResult.AddError("User", "Error creating user", ex.Message);
-                return validationResult;
+                await this.RevertUserRegister(user.UserName);
+
+                return (validationResult, null);
             }
 
-            return validationResult;
+            
         }
 
         private async Task<bool> RevertUserRegister(string userName)

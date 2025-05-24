@@ -25,6 +25,7 @@ services:
             POSTGRES_USER: user
             POSTGRES_PASSWORD: tQ8@Ejn6#pLxVd2RmZ9!KbFsY7*hG4wP
             POSTGRES_DB: TODODb
+            POSTGRES_HOST_AUTH_METHOD: trust
         ports:
             - "8001:5432"
         volumes:

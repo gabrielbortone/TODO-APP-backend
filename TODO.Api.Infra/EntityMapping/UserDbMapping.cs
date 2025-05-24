@@ -11,12 +11,12 @@ namespace TODO.Api.Infra.EntityMapping
             {
                 e.ToTable("ToDoUsers");
                 e.HasKey(u => u.Id);
-                e.Property(u=> u.UserName)
+                e.Property(u=> u.FirstName)
                     .IsRequired()
-                    .HasMaxLength(256);
-                e.Property(u=> u.NormalizedUserName)
-                    .IsRequired()
-                    .HasMaxLength(256);
+                    .HasMaxLength(80);
+                e.Property(u => u.LastName)
+                   .IsRequired()
+                   .HasMaxLength(120);
                 e.Property(u => u.PictureUrl)
                     .IsRequired(false)
                     .HasMaxLength(1024);

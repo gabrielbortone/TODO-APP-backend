@@ -18,11 +18,12 @@ namespace TODO.Api.Infra.Context
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.MapIdentity();
             modelBuilder.MapCategory();
             modelBuilder.MapTodoItem();
-            modelBuilder.MapIdentity();
             modelBuilder.MapUser();
-            base.OnModelCreating(modelBuilder);
         }
 
         public async Task<bool> Commit()

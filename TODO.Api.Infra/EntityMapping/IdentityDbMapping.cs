@@ -35,8 +35,6 @@ namespace TODO.Api.Infra.EntityMapping
             {
                 b.ToTable("UserTokens");
             });
-
-
         }
     }
 }

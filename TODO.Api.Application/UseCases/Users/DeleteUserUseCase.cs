@@ -23,7 +23,7 @@ namespace TODO.Api.Application.UseCases.Users
             {
                 await _userRepository.Delete(id);
                 var result = await _userManager.DeleteAsync(await _userManager.FindByIdAsync(id));
-                if(!result.Succeeded)
+                if (!result.Succeeded)
                 {
                     foreach (var error in result.Errors)
                     {
@@ -33,9 +33,10 @@ namespace TODO.Api.Application.UseCases.Users
             }
             catch (Exception ex)
             {
-                resultValidation.AddError("Id","Error", ex.Message);
+                resultValidation.AddError("Id", "Error", ex.Message);
             }
 
             return resultValidation;
         }
+    }
 }

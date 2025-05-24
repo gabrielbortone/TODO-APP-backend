@@ -2,32 +2,37 @@
 {
     public class User : EntityBase
     {
-        public string UserName { get; private set; }
-        public string NormalizedUserName { get; private set; }
+        public string FirstName { get; private set; }
+        public string LastName { get; private set; }
         public string? PictureUrl { get; private set; }
         public string IdentityUserId { get; private set; }
-        public bool? IsDeleted { get; private set; } = false;
         public virtual ICollection<TodoItem> TodoItems { get; private set; }
 
-        public void Delete()
+        public void ChangeName(string firstName, string lastName)
         {
-            IsDeleted = true;
+            FirstName = firstName;
+            LastName = lastName;
             UpdateEntityBase();
         }
-
-        public void Update(string userName, string pictureUrl)
+        public void SetPictureUrl(string pictureUrl)
         {
-            UserName = userName;
-            NormalizedUserName = UserName.Normalize();
             PictureUrl = pictureUrl;
             UpdateEntityBase();
         }
 
-        public User(string identityUserId,string userName, string pictureUrl)
+        public void Update(string firstName, string lastName, string pictureUrl)
+        {
+            FirstName = firstName;
+            LastName = lastName;
+            PictureUrl = pictureUrl;
+            UpdateEntityBase();
+        }
+
+        public User(string identityUserId,string firstName, string lastName, string pictureUrl)
         {
             IdentityUserId = identityUserId;
-            UserName = userName;
-            NormalizedUserName = UserName.Normalize();
+            FirstName = firstName;
+            LastName = lastName;
             PictureUrl = pictureUrl;
             TodoItems = new HashSet<TodoItem>();
         }
