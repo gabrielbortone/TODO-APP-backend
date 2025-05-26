@@ -7,10 +7,10 @@ namespace TODO.Api.Application.UseCases.Users
     public class DeleteUserUseCase : IDeleteUserUseCase
     {
         private readonly IUserRepository _userRepository;
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<IdentityUser<string>> _userManager;
         public DeleteUserUseCase(
             IUserRepository userRepository,
-            UserManager<IdentityUser> userManager)
+             UserManager<IdentityUser<string>> userManager)
         {
             _userRepository = userRepository;
             _userManager = userManager;

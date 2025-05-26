@@ -13,7 +13,7 @@ namespace TODO.Api.Configuration
             services.AddDbContext<TodoItemDbContext>(options =>
                 options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
 
-            services.AddIdentity<IdentityUser, IdentityRole>()
+            services.AddIdentity<IdentityUser<string>, IdentityRole<string>>()
                 .AddEntityFrameworkStores<TodoItemDbContext>()
                 .AddDefaultTokenProviders();
 

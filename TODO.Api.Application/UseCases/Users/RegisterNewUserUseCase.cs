@@ -8,15 +8,15 @@ namespace TODO.Api.Application.UseCases.Users
 {
     public class RegisterNewUserUseCase : IRegisterNewUserUseCase
     {
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly UserManager<IdentityUser<string>> _userManager;
+        private readonly SignInManager<IdentityUser<string>> _signInManager;
         private readonly ITokenService _tokenService;
         private readonly IUserRepository _userRepository;
         private readonly IImageService _imageService;
 
         public RegisterNewUserUseCase(
-            UserManager<IdentityUser> userManager,
-            SignInManager<IdentityUser> signInManager,
+            UserManager<IdentityUser<string>> userManager,
+            SignInManager<IdentityUser<string>> signInManager,
             ITokenService tokenService,
             IUserRepository userRepository,
             IImageService imageService)

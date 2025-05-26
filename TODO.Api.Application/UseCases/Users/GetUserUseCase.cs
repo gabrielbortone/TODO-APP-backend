@@ -7,9 +7,10 @@ namespace TODO.Api.Application.UseCases.Users
     public class GetUserUseCase : IGetUserUseCase
     {
         private readonly IUserRepository _userRepository;
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<IdentityUser<string>> _userManager;
 
-        public GetUserUseCase(IUserRepository userRepository, UserManager<IdentityUser> userManager)
+        public GetUserUseCase(IUserRepository userRepository, 
+            UserManager<IdentityUser<string>> userManager)
         {
             _userRepository = userRepository;
             _userManager = userManager;

@@ -9,11 +9,11 @@ namespace TODO.Api.Application.UseCases.Users
     {
         private readonly IImageService _imageService;
         private readonly IUserRepository _userRepository;
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<IdentityUser<string>> _userManager;
 
         public UpdateUserUseCase(
             IUserRepository userRepository, 
-            UserManager<IdentityUser> userManager, 
+            UserManager<IdentityUser<string>> userManager, 
             IImageService imageService)
         {
             _userRepository = userRepository;

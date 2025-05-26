@@ -9,14 +9,14 @@ namespace TODO.Api.Application.UseCases.Users
     public class LoginUserUseCase : ILoginUserUseCase
     {
         private readonly JwtAuthConfiguration _config;
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly UserManager<IdentityUser<string>> _userManager;
+        private readonly SignInManager<IdentityUser<string>> _signInManager;
         private readonly ITokenService _tokenService;
         private readonly IUserRepository _userRepository;
         public LoginUserUseCase(
             IOptions<JwtAuthConfiguration> options,
-            UserManager<IdentityUser> userManager,
-            SignInManager<IdentityUser> signInManager,
+            UserManager<IdentityUser<string>> userManager,
+            SignInManager<IdentityUser<string>> signInManager,
             ITokenService tokenService,
             IUserRepository userRepository)
         {

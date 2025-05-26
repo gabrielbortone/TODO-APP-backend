@@ -19,7 +19,7 @@ namespace TODO.Api.Application.DTOs
         {
             ToDoGeneralResumeDto = toDoGeneralResumeDto;
         }
-        public static UserResumeDto FromUser(User user, IdentityUser identityUser)
+        public static UserResumeDto FromUser(User user, IdentityUser<string> identityUser)
         {
             return new UserResumeDto
             {
