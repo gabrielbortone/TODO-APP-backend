@@ -11,8 +11,11 @@ services:
         command: server /data --console-address ":9001"
         volumes:
             - minio-data:/data
-    api:
-        build: ./TODO.Api
+    todo.api:
+        image: ${DOCKER_REGISTRY-}todoapi
+        build:
+            context: .
+            dockerfile: TODO.Api/Dockerfile
         ports:
             - "5000:8081"
         depends_on: 

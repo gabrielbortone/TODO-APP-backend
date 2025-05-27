@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -8,10 +9,12 @@ namespace TODO.Api.Configuration
 {
     public static class IdentityRegistration
     {
-        public static void AddAuthAppConfiguration(this WebApplication app, IConfiguration configuration)
+        public static WebApplication AddAuthAppConfiguration(this WebApplication app, IConfiguration configuration)
         {
             app.UseAuthentication();
             app.UseAuthorization();
+
+            return app;
         }
 
         public static IServiceCollection AddAuthConfiguration(this IServiceCollection services, IConfiguration configuration)
@@ -31,7 +34,12 @@ namespace TODO.Api.Configuration
                     };
                 });
 
-            services.AddAuthorization();
+            services.AddAuthorization(options =>
+            {
+                options.DefaultPolicy = new AuthorizationPolicyBuilder(JwtBearerDefaults.AuthenticationScheme)
+                    .RequireAuthenticatedUser()
+                    .Build();
+            });
 
             return services;
         }

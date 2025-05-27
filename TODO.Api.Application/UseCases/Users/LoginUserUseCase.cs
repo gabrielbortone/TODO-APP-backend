@@ -24,7 +24,7 @@ namespace TODO.Api.Application.UseCases.Users
             _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
             _signInManager = signInManager ?? throw new ArgumentNullException(nameof(signInManager));
             _tokenService = tokenService;
-            _userRepository = userManager as IUserRepository ?? throw new ArgumentNullException(nameof(userRepository));
+            _userRepository = userRepository as IUserRepository ?? throw new ArgumentNullException(nameof(userRepository));
         }
 
         public async Task<(FinalValidationResultDto, TokenJwtResultDto)> Process(string userName, string password)
@@ -63,9 +63,22 @@ namespace TODO.Api.Application.UseCases.Users
 
             var userProfile = await _userRepository.GetByIdentityUserId(identityUserid);
 
+            if (validationResult.Errors.Any())
+            {
+                return (validationResult, new TokenJwtResultDto("", "", "", ""));
+            }
+
             var token = _tokenService.GenerateToken(user.UserName, identityUserid);
 
-            return (validationResult, new TokenJwtResultDto(user.UserName, userProfile.PictureUrl, token));
+            if(string.IsNullOrEmpty(token))
+            {
+                validationResult.AddError("Token", "Invalid Token", "InvalidToken");
+                return (validationResult, new TokenJwtResultDto("", "", "", ""));
+            }
+
+            validationResult.IsValid = true;
+
+            return (validationResult, new TokenJwtResultDto(identityUserid, user.UserName, userProfile.PictureUrl, token));
         }
     }
 }

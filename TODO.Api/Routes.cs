@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using TODO.Api.Application.DTOs;
 using TODO.Api.Application.UseCases.Users;
@@ -26,9 +27,24 @@ namespace TODO.Api
             });
 
 
-            app.MapGet("/users/{id}", async ([FromRoute] string id, [FromServices] IGetUserUseCase useCase) =>
+            app.MapGet("/aboutme", async (HttpContext context,
+                [FromServices] IGetUserUseCase useCase) =>
             {
-                return Results.Ok();
+                var claimsPrincipal = context.User;
+                var userId = claimsPrincipal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return Results.Unauthorized();
+                }
+
+                var (validationResult, userResume) = await useCase.Process(userId);
+                if (!validationResult.IsValid || userResume == null)
+                {
+                    return Results.BadRequest(validationResult);
+                }
+
+                return Results.Ok(userResume);
 
             })
                 .RequireAuthorization()

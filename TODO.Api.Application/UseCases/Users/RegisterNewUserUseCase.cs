@@ -31,7 +31,11 @@ namespace TODO.Api.Application.UseCases.Users
         {
             var validationResult = new FinalValidationResultDto(true, new List<FinalErrorDto>());
 
-            var user = new IdentityUser { UserName = userDto.UserName,  Email = userDto.Email,  };
+            var user = new IdentityUser<string> { 
+                UserName = userDto.UserName,  
+                Email = userDto.Email,
+                Id = Guid.NewGuid().ToString()
+            };
             var result = await _userManager.CreateAsync(user, userDto.Password);
 
             if (!result.Succeeded)
