@@ -6,8 +6,6 @@ using TODO.Api.Infra.Context;
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
 
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll",
@@ -23,6 +21,7 @@ builder.Services.AddAppSettings(configuration);
 builder.Services.AddInfraData(configuration);
 builder.Services.AddApplicationServices();
 builder.Services.AddAuthConfiguration(configuration);
+builder.Services.AddSwagger();
 
 var app = builder.Build();
 
@@ -31,8 +30,7 @@ app.AddAuthAppConfiguration(configuration);
 
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerConfiguration();
 }
 
 using (var scope = app.Services.CreateScope())
