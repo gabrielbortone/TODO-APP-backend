@@ -17,6 +17,8 @@ namespace TODO.Api.Configuration
                 .AddEntityFrameworkStores<TodoItemDbContext>()
                 .AddDefaultTokenProviders();
 
+            services.AddHealthChecks().AddNpgSql(configuration.GetConnectionString("DefaultConnection"), name: "postgresql");
+
             services.AddScoped<ICategoryRepository, CategoryRepository>();
             services.AddScoped<ITodoRepository, TodoRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
