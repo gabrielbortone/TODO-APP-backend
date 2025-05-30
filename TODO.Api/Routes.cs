@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using TODO.Api.Application.DTOs;
+using TODO.Api.Application.UseCases.Categories;
 using TODO.Api.Application.UseCases.Users;
 
 namespace TODO.Api
@@ -10,6 +11,7 @@ namespace TODO.Api
         public static void MapRoutes(this WebApplication app)
         {
             app.MapUsersRoutes();
+            app.MapCategory();
             app.MapToDoRoutes();
             app.MapHealthCheckRoutes();
         }
@@ -62,6 +64,26 @@ namespace TODO.Api
 
             }).RequireAuthorization()
                 .WithName("Delete To-Do")
+                .WithOpenApi();
+        }
+
+        private static void MapCategory(this WebApplication app)
+        {
+            app.MapGet("/categories/", async ([FromServices] IGetCategoriesUseCase useCase) =>
+            {
+                var result = await useCase.Process();
+
+                if(result.ValidationResult.IsValid && result.Data != null)
+                {
+                    return Results.Ok(result);
+                }
+                else
+                {
+                    return Results.BadRequest(result.ValidationResult);
+                }
+
+            }).RequireAuthorization()
+                .WithName("Get all Categories")
                 .WithOpenApi();
         }
 

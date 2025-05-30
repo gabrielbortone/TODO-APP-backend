@@ -4,7 +4,9 @@
       "commandName": "DockerCompose",
       "commandVersion": "1.0",
       "serviceActions": {
-        "todo.api": "StartDebugging"
+        "todo.api": "StartDebugging",
+        "database": "StartWithoutDebugging",
+        "minio": "StartWithoutDebugging"
       }
     }
   }

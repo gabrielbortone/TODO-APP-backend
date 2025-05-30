@@ -1,4 +1,5 @@
 ﻿using TODO.Api.Application.Services;
+using TODO.Api.Application.UseCases.Categories;
 using TODO.Api.Application.UseCases.Users;
 
 namespace TODO.Api.Configuration
@@ -9,11 +10,15 @@ namespace TODO.Api.Configuration
         {
             services.AddScoped<IImageService, ImageService>();
             services.AddScoped<ITokenService, TokenService>();
+
             services.AddScoped<ILoginUserUseCase, LoginUserUseCase>();
             services.AddScoped<IRegisterNewUserUseCase, RegisterNewUserUseCase>();
             services.AddScoped<IDeleteUserUseCase, DeleteUserUseCase>();
             services.AddScoped<IUpdateUserUseCase, UpdateUserUseCase>();
             services.AddScoped<IGetUserUseCase, GetUserUseCase>();
+
+            services.AddScoped<IGetCategoriesUseCase, GetCategoriesUseCase>();
+
 
             return services;
         }
