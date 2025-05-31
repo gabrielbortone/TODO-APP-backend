@@ -21,6 +21,13 @@ namespace TODO.Api.Domain.Entities
             UserId = user.Id;
         }
 
+        public static TodoItem Create(
+            string title,string description, Priority priority, 
+            DateTime? dueDate, Guid categoryId)
+        {
+            return new TodoItem(title, description, priority, dueDate, categoryId);
+        }
+
         public TodoItem(Guid id, string title, string description, Priority priority, DateTime? dueDate, Guid categoryId, Guid userId)
         {
             this.Id = id;
@@ -40,7 +47,14 @@ namespace TODO.Api.Domain.Entities
             CategoryId = categoryId;
             UserId = userId;
         }
-
+        public TodoItem(string title, string description, Priority priority, DateTime? dueDate, Guid categoryId)
+        {
+            Title = title;
+            Description = description;
+            Priority = priority;
+            DueDate = dueDate;
+            CategoryId = categoryId;
+        }
         public void Update(string title, string description, Priority priority, DateTime? dueDate, Guid categoryId)
         {
             Title = title;
@@ -53,8 +67,8 @@ namespace TODO.Api.Domain.Entities
 
         public ToDoItemResume ToResumeObject()
         {
-            return new ToDoItemResume(
-                Title, Description, 
+            return new ToDoItemResume(Id,
+                Title,Description, 
                 (int)Priority, DueDate, 
                 FinishDate, CategoryId, 
                 Category?.Name, 

@@ -2,6 +2,7 @@
 {
     public class ToDoItemResume : IItemGet
     {
+        public Guid Id { get; set; }
         public string Title { get; private set; }
         public string Description { get; private set; }
         public int Priority { get; private set; }
@@ -11,10 +12,11 @@
         public string CategoryName { get; set; }
         public string CategoryDescription { get; set; }
 
-        public ToDoItemResume(string title, string description, int priority,
+        public ToDoItemResume(Guid id, string title, string description, int priority,
             DateTime? dueDate, DateTime? finishDate, Guid categoryId,
             string categoryName, string categoryDescription)
         {
+            Id = id;
             Title = title;
             Description = description;
             Priority = priority;

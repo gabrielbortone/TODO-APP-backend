@@ -22,6 +22,7 @@ builder.Services.AddInfraData(configuration);
 builder.Services.AddApplicationServices();
 builder.Services.AddAuthConfiguration(configuration);
 builder.Services.AddSwagger();
+builder.Services.ConfigureModelState();
 
 var app = builder.Build();
 

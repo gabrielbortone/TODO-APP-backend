@@ -22,7 +22,7 @@ namespace TODO.Api
             app.MapGet("/todos/", async (
                 [FromServices] IGetTodoUserCase useCase,
                 HttpContext context,
-                [FromQuery] string search,
+                [FromQuery] string? search = "",
                 [FromQuery] string orderBy = "Title",
                 [FromQuery] string orderDirection = "asc",
                 [FromQuery] int page = 1,
@@ -51,8 +51,13 @@ namespace TODO.Api
 
                 var result = await useCase.Process(userId, queryParameters);
 
-                if(result.ValidationResult.IsValid && result.Data != null)
+                if (result.ValidationResult.IsValid)
                 {
+                    if (result.Data == null || !result.Data.Any())
+                    {
+                        result.ValidationResult.AddError("Data", "No To-Do items found.", "NoItemsFound");
+                        return Results.NotFound(result.ValidationResult);
+                    }
                     return Results.Ok(result);
                 }
                 else
@@ -64,28 +69,25 @@ namespace TODO.Api
                 .WithName("Get all To-Dos")
                 .WithOpenApi();
 
-            app.MapGet("/todos/finished", async () =>
+            app.MapPost("/todos/", async (
+                [FromServices] ICreateToDoItemUseCase useCase,
+                [FromBody] CreateToDoItemRequestDto request,
+                HttpContext httpContext) =>
             {
-                return Results.Ok();
+                var claimsPrincipal = httpContext.User;
+                var userId = claimsPrincipal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                var (result,validationResult) = await useCase.Process(userId, request);
 
-            }).RequireAuthorization()
-                .WithName("Get all finished To-Dos")
-                .WithOpenApi();
-
-            app.MapPost("/todos/", async () =>
-            {
-                return Results.Ok();
-
+                if(validationResult.IsValid && result != null)
+                {
+                    return Results.Created($"/todos/{result.Id}", result);
+                }
+                else
+                {
+                    return Results.BadRequest(validationResult);
+                }
             }).RequireAuthorization()
                 .WithName("Post To-Do")
-                .WithOpenApi();
-
-            app.MapPut("/todos/mark/{id}", async ([FromRoute] Guid? id) =>
-            {
-                return Results.Ok();
-
-            }).RequireAuthorization()
-                .WithName("Mark To-Do")
                 .WithOpenApi();
 
             app.MapPut("/todos/{id}", async ([FromRoute] Guid? id) =>

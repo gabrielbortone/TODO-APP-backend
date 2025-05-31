@@ -1,5 +1,6 @@
 ﻿using TODO.Api.Application.Services;
 using TODO.Api.Application.UseCases.Categories;
+using TODO.Api.Application.UseCases.TodoItems;
 using TODO.Api.Application.UseCases.Users;
 
 namespace TODO.Api.Configuration
@@ -18,6 +19,9 @@ namespace TODO.Api.Configuration
             services.AddScoped<IGetUserUseCase, GetUserUseCase>();
 
             services.AddScoped<IGetCategoriesUseCase, GetCategoriesUseCase>();
+
+            services.AddScoped<ICreateToDoItemUseCase, CreateToDoItemUseCase>();
+            services.AddScoped<IGetTodoUserCase, GetTodoUserCase>();
 
 
             return services;
