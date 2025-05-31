@@ -22,5 +22,14 @@ namespace TODO.Api.Infra.Repositories.Concrete
                 .Select(x => new CategoryResume(x.Id, x.Name, x.Description, x.Tags))
                 .ToListAsync();
         }
+
+        public async Task<CategoryResume> GetByIdAsync(Guid id)
+        {
+            return await _dbContext.Categories
+                .AsNoTracking()
+                .Where(x => x.Id == id && x.IsDeleted == false)
+                .Select(x => new CategoryResume(x.Id, x.Name, x.Description, x.Tags))
+                .FirstOrDefaultAsync();
+        }
     }
 }
