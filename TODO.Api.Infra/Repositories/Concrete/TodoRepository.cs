@@ -27,10 +27,9 @@ namespace TODO.Api.Infra.Repositories.Concrete
 
             return null;
         }
-
         public async Task<bool> DeleteAsync(Guid id, string userId)
         {
-            var todoItem = await _dbContext.TodoItems.FindAsync(id);
+            var todoItem = await this.GetByIdAsync(id, userId);
             if (todoItem == null || todoItem.User.IdentityUserId != userId)
             {
                 return false;
@@ -59,7 +58,6 @@ namespace TODO.Api.Infra.Repositories.Concrete
 
             return (result, totalPages, totalItems);
         }
-
         public async Task<(List<ToDoItemResume>, int totalPages, int totalItems)> GetAllAsync(
             string userId, string search = null, string orderBy = "Title", string orderDirection = "asc", 
             int? priority = null, DateTime? dueDate = null, DateTime? finishDate = null, 
@@ -122,7 +120,13 @@ namespace TODO.Api.Infra.Repositories.Concrete
                 .Select(t => t.ToResumeObject())
                 .ToListAsync(), totalPages, totalItems);
         }
-
+        public async Task<TodoItem> GetByIdAsync(Guid id, string userId)
+        {
+            return await _dbContext.TodoItems
+                .Include(t => t.Category)
+                .Include(t => t.User)
+                .FirstOrDefaultAsync(x => x.Id == id && x.User.IdentityUserId == userId && x.IsDeleted == false);
+        }
         public async Task<ToDoItemResume> MarkAsync(Guid id, string userId)
         {
             var todoItem = await _dbContext.TodoItems
@@ -146,21 +150,8 @@ namespace TODO.Api.Infra.Repositories.Concrete
             return null;
         }
 
-        public async Task<bool> UpdateAsync(Guid id, TodoItem todoItem, string userId)
+        public async Task<bool> UpdateAsync(TodoItem todoItem)
         {
-            var user = await _dbContext.GetCurrentUserIdAsync(userId);
-
-            var todoItemToUpdate = await _dbContext.TodoItems
-                .Include(t => t.Category)
-                .Include(t => t.User)
-                .FirstOrDefaultAsync(x => x.Id == id && x.UserId == user.Id);
-
-            if (todoItemToUpdate == null)
-            {
-                return false;
-            }
-
-            todoItemToUpdate.Update(todoItem.Title, todoItem.Description, todoItem.Priority, todoItem.DueDate, todoItem.CategoryId);
             _dbContext.TodoItems.Update(todoItem);
             
             return await _dbContext.Commit();

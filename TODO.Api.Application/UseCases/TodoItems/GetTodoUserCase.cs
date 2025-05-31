@@ -12,7 +12,6 @@ namespace TODO.Api.Application.UseCases.TodoItems
             _todoRepository = todoRepository ?? throw new ArgumentNullException(nameof(todoRepository));
         }
 
-
         public async Task<GetItemsResultDto<ToDoItemResume>> Process(string userId, TodoQueryParametersDto todoQueryParameters)
         {
             var result = new GetItemsResultDto<ToDoItemResume>();

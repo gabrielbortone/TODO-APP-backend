@@ -22,6 +22,8 @@ namespace TODO.Api.Configuration
 
             services.AddScoped<ICreateToDoItemUseCase, CreateToDoItemUseCase>();
             services.AddScoped<IGetTodoUserCase, GetTodoUserCase>();
+            services.AddScoped<IUpdateTodoItemUseCase, UpdateTodoItemUseCase>();
+            services.AddScoped<IDeleteTodoItemUseCase, DeleteTodoItemUseCase>();
 
 
             return services;

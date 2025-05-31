@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using TODO.Api.Application.DTOs;
 using TODO.Api.Application.UseCases.Categories;
@@ -15,6 +16,12 @@ namespace TODO.Api
             app.MapCategory();
             app.MapToDoRoutes();
             app.MapHealthCheckRoutes();
+        }
+
+        private static string GetUserId(HttpContext context)
+        {
+            var claimsPrincipal = context.User;
+            return claimsPrincipal.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? string.Empty;
         }
 
         private static void MapToDoRoutes(this WebApplication app)
@@ -46,9 +53,7 @@ namespace TODO.Api
                     IncludeCompleted = includeCompleted
                 };
 
-                var claimsPrincipal = context.User;
-                var userId = claimsPrincipal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
+                var userId = GetUserId(context);
                 var result = await useCase.Process(userId, queryParameters);
 
                 if (result.ValidationResult.IsValid)
@@ -74,8 +79,7 @@ namespace TODO.Api
                 [FromBody] CreateToDoItemRequestDto request,
                 HttpContext httpContext) =>
             {
-                var claimsPrincipal = httpContext.User;
-                var userId = claimsPrincipal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                var userId = GetUserId(httpContext);
                 var (result,validationResult) = await useCase.Process(userId, request);
 
                 if(validationResult.IsValid && result != null)
@@ -90,18 +94,58 @@ namespace TODO.Api
                 .WithName("Post To-Do")
                 .WithOpenApi();
 
-            app.MapPut("/todos/{id}", async ([FromRoute] Guid? id) =>
+            app.MapPut("/todos/{id}", async (
+                [FromRoute] Guid? id,
+                [FromBody] UpdateToDoItemRequestDto request,
+                [FromServices] IUpdateTodoItemUseCase useCase,
+                HttpContext context) =>
             {
-                return Results.Ok();
+                var userId = GetUserId(context);
 
+                if (id == null || id != request.Id)
+                {
+                    return Results.BadRequest(new FinalValidationResultDto
+                    {
+                        IsValid = false,
+                        Errors = new List<FinalErrorDto>
+                        {
+                            new FinalErrorDto("Id", "The id must be provided and cannot be empty and be equal to another one.", "EmptyId")
+                        }
+                    });
+                }
+
+                var result = await useCase.Process(userId, request);
+
+                if (!result.IsValid)
+                {
+                    bool isNotFound = result.Errors.FirstOrDefault()?.ErrorCode == "TodoItemNotFound";
+                    if (isNotFound)
+                    {
+                        return Results.NotFound(result);
+                    }
+
+                    return Results.BadRequest(result);
+                }
+
+                return Results.NoContent();
             }).RequireAuthorization()
                 .WithName("Put To-Do")
                 .WithOpenApi();
 
-            app.MapDelete("/todos/{id}", async ([FromRoute] Guid? id) =>
+            app.MapDelete("/todos/{id}", async (
+                [FromRoute] Guid id,
+                [FromServices] IDeleteTodoItemUseCase useCase,
+                HttpContext context) =>
             {
-                return Results.Ok();
+                var userId = GetUserId(context);
+                var validationResult = await useCase.Process(userId, id);
 
+                if(!validationResult.IsValid)
+                {
+                    return Results.BadRequest(validationResult);
+                }
+
+                return Results.NoContent();
             }).RequireAuthorization()
                 .WithName("Delete To-Do")
                 .WithOpenApi();
@@ -163,8 +207,7 @@ namespace TODO.Api
             app.MapGet("/aboutme", async (HttpContext context,
                [FromServices] IGetUserUseCase useCase) =>
             {
-                var claimsPrincipal = context.User;
-                var userId = claimsPrincipal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                var userId = GetUserId(context);
 
                 if (string.IsNullOrEmpty(userId))
                 {
@@ -203,11 +246,11 @@ namespace TODO.Api
                 [FromRoute] string id,
                 [FromBody] UpdateUserDto request,
                 [FromServices] IUpdateUserUseCase useCase,
-                ClaimsPrincipal claimsPrincipal) =>
+                HttpContext context) =>
             {
                 var validationResult = new FinalValidationResultDto();
 
-                var userId = claimsPrincipal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                var userId = GetUserId(context); ;
 
                 if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(id))
                 {
