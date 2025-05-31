@@ -14,5 +14,6 @@ namespace TODO.Api.Infra.Repositories.Abstract
         Task<ToDoItemResume> MarkAsync(Guid id, string userId);
         Task<bool> UpdateAsync(TodoItem todoItem);
         Task<bool> DeleteAsync(Guid id, string userId);
+        Task<(int todoCreated, int todoUpdated, int todoCompleted, int todoRemoved)> GetDashboardAsync(string userId);
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using TODO.Api.Application.DTOs;
+using TODO.Api.Application.Services;
 using TODO.Api.Infra.Repositories.Abstract;
 
 namespace TODO.Api.Application.UseCases.Users
@@ -8,12 +9,15 @@ namespace TODO.Api.Application.UseCases.Users
     {
         private readonly IUserRepository _userRepository;
         private readonly UserManager<IdentityUser<string>> _userManager;
+        private readonly IDashboardService _dashboardService;
 
         public GetUserUseCase(IUserRepository userRepository, 
-            UserManager<IdentityUser<string>> userManager)
+            UserManager<IdentityUser<string>> userManager,
+            IDashboardService dashboardService)
         {
-            _userRepository = userRepository;
-            _userManager = userManager;
+            _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
+            _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
+            _dashboardService = dashboardService ?? throw new ArgumentNullException(nameof(dashboardService));
         }
 
         public async Task<(FinalValidationResultDto, UserResumeDto)> Process(string userId)

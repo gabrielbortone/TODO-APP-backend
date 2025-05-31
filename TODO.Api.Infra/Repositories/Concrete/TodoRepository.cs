@@ -35,7 +35,8 @@ namespace TODO.Api.Infra.Repositories.Concrete
                 return false;
             }
 
-            _dbContext.TodoItems.Remove(todoItem);
+            todoItem.Delete();
+            _dbContext.TodoItems.Update(todoItem);
             return await _dbContext.Commit();
         }
 
@@ -127,6 +128,26 @@ namespace TODO.Api.Infra.Repositories.Concrete
                 .Include(t => t.User)
                 .FirstOrDefaultAsync(x => x.Id == id && x.User.IdentityUserId == userId && x.IsDeleted == false);
         }
+
+        public async Task<(int todoCreated, int todoUpdated, int todoCompleted, int todoRemoved)> GetDashboardAsync(string userId)
+        {
+            var user = await _dbContext.GetCurrentUserIdAsync(userId);
+            int todoCreated = await _dbContext.TodoItems
+                .CountAsync(t=> t.UserId.Equals(user.Id));
+
+            int todoUpdated = await _dbContext.TodoItems.CountAsync(t => t.UserId.Equals(user.Id) &&
+                t.UpdatedAt != null &&
+                !t.IsDeleted);
+
+            int todoCompleted = await _dbContext.TodoItems.CountAsync(t => t.UserId.Equals(user.Id) &&
+                t.FinishDate != null &&
+                !t.IsDeleted);
+
+            int todoRemoved = await _dbContext.TodoItems.CountAsync(t => t.UserId.Equals(user.Id) && t.IsDeleted);
+
+            return (todoCreated, todoUpdated, todoCompleted, todoRemoved);
+        }
+
         public async Task<ToDoItemResume> MarkAsync(Guid id, string userId)
         {
             var todoItem = await _dbContext.TodoItems
