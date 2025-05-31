@@ -20,4 +20,8 @@
     <ProjectReference Include="..\TODO.Api.Domain\TODO.Api.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Extension\" />
+  </ItemGroup>
+
 </Project>

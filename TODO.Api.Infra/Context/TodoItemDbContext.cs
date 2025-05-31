@@ -31,5 +31,16 @@ namespace TODO.Api.Infra.Context
         {
             return (await SaveChangesAsync()) > 0;
         }
+
+        public async Task<User> GetCurrentUserIdAsync(string identityUserId)
+        {
+            var user = await this.ToDoUsers.FirstOrDefaultAsync(u=> u.IdentityUserId == identityUserId);
+            if (user == null)
+            {
+                throw new InvalidOperationException("No user is currently logged in.");
+            }
+
+            return user;
+        }
     }
 }

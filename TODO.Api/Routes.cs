@@ -2,6 +2,7 @@
 using System.Security.Claims;
 using TODO.Api.Application.DTOs;
 using TODO.Api.Application.UseCases.Categories;
+using TODO.Api.Application.UseCases.TodoItems;
 using TODO.Api.Application.UseCases.Users;
 
 namespace TODO.Api
@@ -18,9 +19,46 @@ namespace TODO.Api
 
         private static void MapToDoRoutes(this WebApplication app)
         {
-            app.MapGet("/todos/", async () =>
+            app.MapGet("/todos/", async (
+                [FromServices] IGetTodoUserCase useCase,
+                HttpContext context,
+                [FromQuery] string search,
+                [FromQuery] string orderBy = "Title",
+                [FromQuery] string orderDirection = "asc",
+                [FromQuery] int page = 1,
+                [FromQuery] int itemsPerPage = 10,
+                [FromQuery] int? priority = null,
+                [FromQuery] DateTime? dueDate = null,
+                [FromQuery] DateTime? finishDate = null,
+                [FromQuery] bool? includeCompleted = null) =>
             {
-                return Results.Ok();
+
+                var queryParameters = new TodoQueryParametersDto
+                {
+                    Search = search,
+                    OrderBy = orderBy,
+                    OrderDirection = orderDirection,
+                    Page = page,
+                    ItemsPerPage = itemsPerPage,
+                    Priority = priority,
+                    DueDate = dueDate,
+                    FinishDate = finishDate,
+                    IncludeCompleted = includeCompleted
+                };
+
+                var claimsPrincipal = context.User;
+                var userId = claimsPrincipal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                var result = await useCase.Process(userId, queryParameters);
+
+                if(result.ValidationResult.IsValid && result.Data != null)
+                {
+                    return Results.Ok(result);
+                }
+                else
+                {
+                    return Results.BadRequest(result.ValidationResult);
+                }
 
             }).RequireAuthorization()
                 .WithName("Get all To-Dos")

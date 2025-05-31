@@ -1,4 +1,6 @@
-﻿namespace TODO.Api.Domain.Entities
+﻿using TODO.Api.Domain.ResumeObject;
+
+namespace TODO.Api.Domain.Entities
 {
     public class TodoItem : EntityBase
     {
@@ -12,6 +14,12 @@
 
         public Guid UserId { get; private set; }
         public virtual User User { get; private set; }
+
+        public void ConfigureUser(User user)
+        {
+            User = user ?? throw new ArgumentNullException(nameof(user));
+            UserId = user.Id;
+        }
 
         public TodoItem(Guid id, string title, string description, Priority priority, DateTime? dueDate, Guid categoryId, Guid userId)
         {
@@ -41,6 +49,28 @@
             DueDate = dueDate;
             CategoryId = categoryId;
             UpdateEntityBase();
+        }
+
+        public ToDoItemResume ToResumeObject()
+        {
+            return new ToDoItemResume(
+                Title, Description, 
+                (int)Priority, DueDate, 
+                FinishDate, CategoryId, 
+                Category?.Name, 
+                Category?.Description);
+        }
+
+        public void Mark()
+        {
+            if (FinishDate.HasValue)
+            {
+                MarkAsNotCompleted();
+            }
+            else
+            {
+                MarkAsCompleted();
+            }
         }
 
         public void MarkAsCompleted()
